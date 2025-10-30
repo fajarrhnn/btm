@@ -22,18 +22,18 @@ import useOnBurn from "@/hooks/logic";
 import dayjs from "dayjs";
 
 export default function HomePage() {
-  const { serialNumber, handleSerialNumberChange, input, units } = useOnBurn();
+  const { serialNumber, handleSerialNumberChange, updateStatus, units } =
+    useOnBurn();
 
-  const inTestingUnits = units.filter((item) => item.status === "In Testing");
+  const reportedUnit = units.filter((item) => item.status === "Reported");
 
   return (
     <>
       <h1 className="font-semibold text-right text-base sticky top-5">
-        Total Unit in Testing: {inTestingUnits.length}
+        Total Unit has Reported: {reportedUnit.length}
       </h1>
-
       <Table>
-        <TableCaption>Unit list currently being tested.</TableCaption>
+        <TableCaption>Unit list has been reported.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Serial Number</TableHead>
@@ -42,7 +42,7 @@ export default function HomePage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {inTestingUnits.map((item, index) => (
+          {reportedUnit?.map((item, index) => (
             <TableRow key={index}>
               <TableCell className="font-medium">{item.serialNumber}</TableCell>
               <TableCell>{item.status}</TableCell>
@@ -57,13 +57,18 @@ export default function HomePage() {
       <Dialog>
         <DialogTrigger asChild>
           <div className="bottom-5 right-5 fixed">
-            <Button size="icon">
+            <Button size={"icon"}>
               <Plus />
             </Button>
           </div>
         </DialogTrigger>
         <DialogContent>
-          <form onSubmit={input}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateStatus(serialNumber);
+            }}
+          >
             <DialogHeader>
               <DialogTitle>Input Serial Number</DialogTitle>
             </DialogHeader>
