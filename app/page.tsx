@@ -1,4 +1,3 @@
-"use client";
 import {
   Table,
   TableBody,
@@ -8,28 +7,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import useOnBurn from "@/hooks/logic";
+
 import dayjs from "dayjs";
+import InputNewSerialNumber from "@/components/input-new-sn";
+import { GetData } from "@/service/get-data";
 
-export default function HomePage() {
-  const { serialNumber, handleSerialNumberChange, input, units } = useOnBurn();
-
-  const inTestingUnits = units.filter((item) => item.status === "In Testing");
-
+export default async function HomePage() {
+  const body = await GetData();
+  const listUnit = await body.data;
+  const filteredUnit = listUnit.filter((u: any) => u.status === "burn");
   return (
     <>
       <h1 className="font-semibold text-right text-base sticky top-5">
-        Total Unit in Testing: {inTestingUnits.length}
+        Total Unit in Testing: {filteredUnit.length}
       </h1>
 
       <Table>
@@ -39,48 +29,31 @@ export default function HomePage() {
             <TableHead>Serial Number</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Timestamp</TableHead>
+            <TableHead>File Report</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {inTestingUnits.map((item, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">{item.serialNumber}</TableCell>
-              <TableCell>{item.status}</TableCell>
-              <TableCell>
-                {dayjs(item.timestamp).format("YYYY-MM-DD HH:mm:ss")}
-              </TableCell>
-            </TableRow>
-          ))}
+          {filteredUnit.map(
+            (
+              item: { serialnumber: string; status: string; timestamp: string },
+              index: number
+            ) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  {item.serialnumber}
+                </TableCell>
+                <TableCell>{item.status}</TableCell>
+                <TableCell>
+                  {dayjs(item.timestamp).format("YYYY-MM-DD HH:mm:ss")}
+                </TableCell>
+                <TableCell>-</TableCell>
+              </TableRow>
+            )
+          )}
         </TableBody>
       </Table>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="bottom-5 right-5 fixed">
-            <Button size="icon">
-              <Plus />
-            </Button>
-          </div>
-        </DialogTrigger>
-        <DialogContent>
-          <form onSubmit={input}>
-            <DialogHeader>
-              <DialogTitle>Input Serial Number</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <Input
-                type="text"
-                id="serialNumber"
-                placeholder="Enter serial number"
-                required
-                onChange={handleSerialNumberChange}
-                value={serialNumber}
-              />
-              <Button type="submit">Submit</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <InputNewSerialNumber />
     </>
   );
 }

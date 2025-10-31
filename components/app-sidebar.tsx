@@ -17,7 +17,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <SidebarGroupLabel>BurnIn Test System</SidebarGroupLabel>
+        <SidebarGroupLabel>Zyrex BurnIn Test Management System</SidebarGroupLabel>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

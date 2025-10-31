@@ -1,4 +1,3 @@
-"use client";
 import {
   Table,
   TableBody,
@@ -8,29 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import useOnBurn from "@/hooks/logic";
 import dayjs from "dayjs";
+import { GetData } from "@/service/get-data";
+import UpdateStatusBurnin from "@/components/update-sn";
 
-export default function HomePage() {
-  const { serialNumber, handleSerialNumberChange, updateStatus, units } =
-    useOnBurn();
+export default async function HomePage() {
+  const body = await GetData();
+  const listUnit = body.data;
+  const filteredUnit = listUnit.filter((u: any) => u.status === "reported");
 
-  const reportedUnit = units.filter((item) => item.status === "Reported");
 
   return (
     <>
       <h1 className="font-semibold text-right text-base sticky top-5">
-        Total Unit has Reported: {reportedUnit.length}
+        Total Unit has Reported: {filteredUnit.length}
       </h1>
       <Table>
         <TableCaption>Unit list has been reported.</TableCaption>
@@ -39,53 +29,24 @@ export default function HomePage() {
             <TableHead>Serial Number</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Timestamp</TableHead>
+            <TableHead>File Report</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {reportedUnit?.map((item, index) => (
+          {filteredUnit?.map((item: { serialnumber: string, status: string, timestamp: string }, index: number) => (
             <TableRow key={index}>
-              <TableCell className="font-medium">{item.serialNumber}</TableCell>
+              <TableCell className="font-medium">{item.serialnumber}</TableCell>
               <TableCell>{item.status}</TableCell>
               <TableCell>
                 {dayjs(item.timestamp).format("YYYY-MM-DD HH:mm:ss")}
               </TableCell>
+              <TableCell>-</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="bottom-5 right-5 fixed">
-            <Button size={"icon"}>
-              <Plus />
-            </Button>
-          </div>
-        </DialogTrigger>
-        <DialogContent>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              updateStatus(serialNumber);
-            }}
-          >
-            <DialogHeader>
-              <DialogTitle>Input Serial Number</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <Input
-                type="text"
-                id="serialNumber"
-                placeholder="Enter serial number"
-                required
-                onChange={handleSerialNumberChange}
-                value={serialNumber}
-              />
-              <Button type="submit">Submit</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <UpdateStatusBurnin />
     </>
   );
 }
