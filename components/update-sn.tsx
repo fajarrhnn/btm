@@ -25,7 +25,7 @@ export default function UpdateStatusBurnin() {
                     <form
                         onSubmit={async (e) => {
                             e.preventDefault();
-                            const response = await fetch("http://localhost:3000/api", {
+                            const response = await fetch("/api", {
                                 method: "PATCH",
                                 headers: {
                                     "Content-Type": "application/json",
